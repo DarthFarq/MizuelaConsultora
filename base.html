@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Beacon Monitoring System</title>
+    <style>
+        :root {
+            --bg: #111827;
+            --card: #1f2937;
+            --ok: #22c55e;
+            --warn: #eab308;
+            --fault: #ef4444;
+            --timeout: #ff4757;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: #f8fafc;
+            padding: 40px;
+            margin: 0;
+        }
+
+        /* Indicador de HUB flotante */
+        #hub-status {
+            position: fixed; top: 20px; right: 20px;
+            padding: 8px 16px; border-radius: 30px;
+            font-size: 0.75rem; font-weight: bold;
+            background: #1f2937;
+            border: 1px solid #475569;
+            display: flex; align-items: center; gap: 8px; z-index: 1000;
+        }
+        .dot { width: 8px; height: 8px; border-radius: 50%; transition: 0.3s; }
+        .dot-online { background: var(--ok); box-shadow: 0 0 8px var(--ok); }
+        .dot-offline { background: var(--fault); box-shadow: 0 0 8px var(--fault); }
+
+        h1 { text-align: center; letter-spacing: 5px; font-weight: 300; margin-bottom: 40px; text-transform: uppercase; }
+
+        .grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 0;
+            border: 1px solid #374151;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        /* Efecto de congelado cuando el HUB o Beacon están offline */
+        .is-offline {
+            opacity: 0.4;
+            filter: grayscale(1);
+            /*pointer-events: none;*/
+        }
+
+        /* Barra de alerta para pérdida de tramas individual */
+        .timeout-bar {
+            position: absolute; top: 0; left: 0; width: 100%; height: 5px;
+            background: var(--timeout); animation: blink 1s infinite;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        .card-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .beacon-img { width: 65px; height: auto; }
+
+        .badge {
+            display: inline-block; padding: 4px 10px; border-radius: 6px;
+            font-size: 0.7rem; font-weight: bold; text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+        .badge-ok { color: var(--ok); background: rgba(34,197,94,0.1); }
+        .badge-warning { color: var(--warn); background: rgba(234,179,8,0.1); }
+        .badge-fault { color: var(--fault); background: rgba(239,68,68,0.1); }
+        .badge-timeout { color: var(--timeout); background: rgba(255,71,87,0.2); border: 1px solid var(--timeout); }
+        .badge-offline { color: #94a3b8; background: rgba(148,163,184,0.1); }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+
+        .data-item {
+            display: flex;
+            flex-direction: column;
+            min-width: 90px;
+        }
+        .label { color: #9ca3af; font-size: 0.7rem; text-transform: uppercase; }
+        .value { font-family: 'JetBrains Mono', monospace; font-size: 1.35rem; }
+
+        .footer {
+            margin-top: 20px; padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        input {
+            background: #1f2937;
+            border: 1px solid #475569;
+            color: #93c5fd;
+        }
+        button {
+            background: #374151; color: white; border: none; padding: 6px 12px;
+            border-radius: 6px; cursor: pointer; font-size: 0.65rem; font-weight: bold;
+        }
+        button:hover { background: #4b5563; }
+
+        /* Toast indicator */
+        .toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            padding: 12px 24px; border-radius: 10px; font-size: 0.85rem; font-weight: bold;
+            z-index: 2000; opacity: 0; transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .toast.show { opacity: 1; }
+        .toast-success { background: rgba(34,197,94,0.9); color: #fff; }
+        .toast-error { background: rgba(239,68,68,0.9); color: #fff; }
+
+        /* UART Log panel */
+        .log-toggle {
+            position: fixed; bottom: 0; left: 0; width: 100%; z-index: 1500;
+        }
+        .log-toggle-btn {
+            display: block; width: 100%; padding: 8px; text-align: center;
+            background: #1e293b; color: #94a3b8; border: none; border-top: 1px solid #334155;
+            cursor: pointer; font-size: 0.75rem; font-weight: bold; letter-spacing: 2px;
+        }
+        .log-toggle-btn:hover { background: #334155; color: #f8fafc; }
+        .log-panel {
+            display: none;
+            background: #111827; border-top: 1px solid #334155;
+        }
+        .log-panel.open { display: block; }
+        .log-content {
+            height: 250px; overflow-y: auto; padding: 10px 16px;
+            font-family: 'JetBrains Mono', 'Consolas', monospace; font-size: 0.75rem;
+            line-height: 1.6;
+        }
+        .log-entry-tx { color: #60a5fa; }
+        .log-entry-rx { color: #a3e635; }
+        .log-ts { color: #475569; margin-right: 8px; }
+        .log-dir { display: inline-block; width: 28px; font-weight: bold; }
+
+        .card-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            cursor: pointer;
+        }
+        .card-row:hover {
+            background: rgba(255,255,255,0.04);
+        }
+
+        .beacon-img-small {
+            width: 40px;
+        }
+
+        .row-main {
+            flex: 1;
+        }
+
+        .row-title {
+            font-weight: 500;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .card-detail {
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            margin-top: 0;
+            padding: 0 20px;
+        }
+
+        .card.expanded .card-detail {
+            max-height: 500px;
+            margin-top: 15px;
+            padding: 15px 20px 20px 20px;
+        }
+
+        .badge-group {
+            display: flex;
+            gap: 8px;
+            margin-left: auto;
+        }
+
+        .badge-sync {
+            color: #60a5fa;
+            background: rgba(96,165,250,0.1);
+        }
+
+        .badge-sync.unsynced {
+            color: var(--timeout);
+            background: rgba(255,71,87,0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="hub-status">
+        <div id="hub-dot" class="dot {{ 'dot-online' if uart_status else 'dot-offline' }}"></div>
+        <span id="hub-text">{{ 'HUB CONNECTED' if uart_status else 'HUB DISCONNECTED' }}</span>
+    </div>
+
+    <button id="reset-system-btn" onclick="resetSystem()"
+            style="position:fixed; top:70px; right:20px; background:#7f1d1d; color:white;
+                   border:1px solid #991b1b; padding:6px 14px; border-radius:8px;
+                   font-size:0.7rem; font-weight:bold; cursor:pointer; z-index:1000;">
+        Reset Database
+    </button>
+
+    <div id="toast" class="toast"></div>
+
+    <h1>BEACON MONITORING SYSTEM</h1>
+
+    <div class="grid">
+        {% for t in beacons %}
+        <div class="card {{ 'is-offline' if t.status == 'offline' }}" id="card-{{ t.id }}">
+
+            <!-- HEADER (clickable) -->
+            <div class="card-row" onclick="toggleCard('{{ t.id }}')">
+
+                <img id="img-{{ t.id }}"
+                    src="/static/beacon_{{ 'red' if t.status in ['fault', 'timeout'] else 'yellow' if t.status=='warning' else 'green' if t.status=='ok' else 'gray' }}.png"
+                    class="beacon-img-small">
+
+                <div class="row-main">
+                    <div class="row-title">
+                        BEACON {{ loop.index0 }}
+                        <span id="name-{{ t.id }}" class="beacon-name">{{ t.name }}</span>
+                    </div>
+                </div>
+
+                <div class="badge-group">
+                    <div id="badge-sync-{{ t.id }}" class="badge badge-sync">
+                        {% if t.status in ['timeout','offline'] %}
+                            UNSYNCED
+                        {% else %}
+                            SYNCED
+                        {% endif %}
+                    </div>
+
+                    <div id="badge-health-{{ t.id }}" class="badge badge-{{ t.status }}">
+                        {% if t.status == 'timeout' %}
+                            DATA LOSS
+                        {% elif t.status == 'offline' %}
+                            OFFLINE
+                        {% else %}
+                            {{ t.status.upper() }}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- DETALLE EXPANDIBLE -->
+            <div class="card-detail" id="detail-{{ t.id }}">
+
+                <div class="data-row">
+                    <div class="data-item">
+                        <div class="label">Signal</div>
+                        <div class="value"><span class="rssi-val">{{ t.rssi }}</span> dBm</div>
+                    </div>
+
+                    <div class="data-item">
+                        <div class="label">Temp</div>
+                        <div class="value"><span class="temp-val">{{ t.temp }}</span> °C</div>
+                    </div>
+
+                    <div class="data-item">
+                        <div class="label">Voltage</div>
+                        <div class="value"><span class="volt-val">{{ t.volt }}</span> V</div>
+                    </div>
+
+                    <div class="data-item">
+                        <div class="label">Current</div>
+                        <div class="value"><span class="curr-val">{{ t.curr }}</span> mA</div>
+                    </div>
+
+                    <div class="data-item">
+                        <div class="label">Uptime</div>
+                        <div class="value"><span class="uptime-val">{{ t.uptime }}</span></div>
+                    </div>
+                </div>
+
+                <div class="footer">
+                    <form action="/update_ref/{{ t.id }}" method="POST"
+                        onsubmit="return handleUpdate(event, '{{ t.id }}')"
+                        style="width:100%; display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <span class="label">REF:</span>
+                            <input type="number" name="ref_rssi" value="{{ t.ref_rssi }}">
+                        </div>
+                        <button type="submit">RESET</button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        function submitRef(form) {
+            const formData = new FormData(form);
+            fetch(form.action, { method: 'POST', body: formData });
+            showToast('Reference updated ✓', true);
+        }
+
+        function showToast(message, success) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${success ? 'toast-success' : 'toast-error'} show`;
+            setTimeout(() => { toast.classList.remove('show'); }, 5000);
+        }
+
+        function handleUpdate(event, bcId) {
+            event.preventDefault();
+            const form = event.target;
+            const btn = form.querySelector('button');
+            const origText = btn.textContent;
+            btn.textContent = 'SENDING...';
+            btn.disabled = true;
+
+            // Send reboot command via UART
+            fetch(`/api/reboot_beacon/${bcId}`, { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast(`BEACON ${bcId} — Reboot ACK received ✓`, true);
+                    } else {
+                        showToast(`BEACON ${bcId} — No ACK received ✗`, false);
+                    }
+                })
+                .catch(() => {
+                    showToast(`BEACON ${bcId} — Request failed ✗`, false);
+                })
+                .finally(() => {
+                    btn.textContent = origText;
+                    btn.disabled = false;
+                    // Submit the ref update via AJAX to avoid page reload
+                    const formData = new FormData(form);
+                    fetch(form.action, { method: 'POST', body: formData });
+                });
+
+            return false;
+        }
+
+        function resetSystem() {
+            const btn = document.getElementById('reset-system-btn');
+            btn.textContent = '...';
+            btn.disabled = true;
+            fetch('/api/reset_system', { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast('System reset — beacon data cleared ✓', true);
+                    } else {
+                        showToast('Reset failed ✗', false);
+                    }
+                })
+                .catch(() => showToast('Reset request failed ✗', false))
+                .finally(() => { btn.textContent = 'Reset Database'; btn.disabled = false; });
+        }
+
+        function updateData() {
+            fetch('/api/data')
+                .then(res => res.json())
+                .then(data => {
+                    // 1. Actualizar indicador del HUB
+                    const hubText = document.getElementById('hub-text');
+                    const hubDot = document.getElementById('hub-dot');
+                    hubText.innerText = data.uart_connected ? "HUB CONNECTED" : "HUB DISCONNECTED";
+                    hubDot.className = `dot ${data.uart_connected ? 'dot-online' : 'dot-offline'}`;
+
+                    // 2. Actualizar cada tarjeta de Beacon
+                    data.beacons.forEach(b => {
+                        const card = document.getElementById(`card-${b.id}`);
+                        const img = document.getElementById(`img-${b.id}`);
+                        const badgeSync = document.getElementById(`badge-sync-${b.id}`);
+                        const badgeHealth = document.getElementById(`badge-health-${b.id}`);
+                        const nameEl = document.getElementById(`name-${b.id}`);
+
+                        if(!card) return;
+
+                        // Actualizar Nombre (Para que cambie de "Waiting" a su nombre real)
+                        if(nameEl) nameEl.innerText = b.name;
+
+                        // Determinar color de imagen (Cache busting incluido)
+                        let color = 'gray';
+                        if(b.status === 'ok') color = 'green';
+                        else if(b.status === 'warning') color = 'yellow';
+                        else if(b.status === 'fault' || b.status === 'timeout') color = 'red';
+
+                        img.src = `/static/beacon_${color}.png?t=` + Date.now();
+
+                        // SYNC
+                        let sync = 'synced';
+                        if (b.status === 'timeout' || b.status === 'offline') {
+                            sync = 'unsynced';
+                        }
+
+                        badgeSync.className = `badge badge-sync ${sync}`;
+                        badgeSync.innerText = sync.toUpperCase();
+
+                        // HEALTH
+                        let healthText = '';
+                        let healthClass = 'badge';
+
+                        if (b.status === 'timeout') {
+                            healthText = 'DATA LOSS';
+                            healthClass += ' badge-timeout';
+                        }
+                        else if (b.status === 'offline') {
+                            healthText = 'OFFLINE';
+                            healthClass += ' badge-offline';
+                        }
+                        else {
+                            healthText = b.status.toUpperCase();
+                            healthClass += ` badge-${b.status}`;
+                        }
+
+                        badgeHealth.className = healthClass;
+                        badgeHealth.innerText = healthText;
+
+                        // Lógica de congelado (Offline)
+                        if (b.status === 'offline') {
+                            card.classList.add('is-offline');
+                        } else {
+                            card.classList.remove('is-offline');
+                        }
+
+                        // Lógica de barra de alarma individual (Solo si el HUB funciona)
+                        let bar = card.querySelector('.timeout-bar');
+                        if (b.status === 'timeout' && data.uart_connected) {
+                            if (!bar) {
+                                bar = document.createElement('div');
+                                bar.className = 'timeout-bar';
+                                card.prepend(bar);
+                            }
+                        } else {
+                            if (bar) bar.remove();
+                        }
+
+                        // Actualizar valores numéricos (quedan congelados si está offline)
+                        card.querySelector('.rssi-val').innerText = b.rssi;
+                        card.querySelector('.temp-val').innerText = b.temp;
+                        card.querySelector('.volt-val').innerText = b.volt;
+                        card.querySelector('.curr-val').innerText = b.curr;
+                        card.querySelector('.uptime-val').innerText = b.uptime;
+                    });
+                })
+                .catch(err => console.error("Error al obtener datos:", err));
+        }
+
+        // Ejecutar actualización cada 2 segundos
+        setInterval(updateData, 2000);
+
+        // UART Log panel
+        let logLastId = 0;
+
+        function toggleLog() {
+            document.getElementById('log-panel').classList.toggle('open');
+        }
+
+        function pollLog() {
+            fetch(`/api/uart_log?since=${logLastId}`)
+                .then(res => res.json())
+                .then(data => {
+                    const logContent = document.getElementById('log-content');
+                    if (!logContent) return;
+                    const atBottom = (logContent.scrollHeight - logContent.scrollTop - logContent.clientHeight) < 5;
+                    if (data.entries.length > 0) {
+                        data.entries.forEach(e => {
+                            const cls = e.dir === 'TX' ? 'log-entry-tx' : 'log-entry-rx';
+                            const line = document.createElement('div');
+                            line.className = cls;
+                            line.innerHTML = `<span class="log-ts">${e.ts}</span><span class="log-dir">${e.dir}</span>${e.data.replace(/</g,'&lt;')}`;
+                            logContent.appendChild(line);
+                        });
+                        // Cap DOM nodes to prevent browser slowdown over time
+                        const maxLogNodes = 300;
+                        while (logContent.childElementCount > maxLogNodes) {
+                            logContent.removeChild(logContent.firstChild);
+                        }
+                        logLastId = data.entries[data.entries.length - 1].id;
+                        if (atBottom) {
+                            logContent.scrollTop = logContent.scrollHeight;
+                        }
+                    }
+                })
+                .catch(() => {});
+        }
+        setInterval(pollLog, 500);
+
+        function toggleCard(id) {
+            const card = document.getElementById(`card-${id}`);
+            card.classList.toggle('expanded');
+        }
+    </script>
+
+    <div class="log-toggle">
+        <div id="log-panel" class="log-panel">
+            <div id="log-content" class="log-content"></div>
+        </div>
+        <button class="log-toggle-btn" onclick="toggleLog()">▲ UART LOG ▲</button>
+    </div>
+</body>
+</html>
