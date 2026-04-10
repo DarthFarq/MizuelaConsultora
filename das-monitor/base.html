@@ -1,10 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>DAS Monitor</title>
+    <title>Demo Dashboard</title>
 </head>
 <body>
+
+    <h1>DAS Monitor</h1>
+
+    <button onclick="navigate('floor')">Floor</button>
+    <button onclick="navigate('antennas')">Antennas</button>
+    <button onclick="navigate('building')">Building</button>
+
+    <hr>
+
+    <div id="app"></div>
+
+    <script type="module" src="./js/app.js"></script>
 
 </body>
 </html>
