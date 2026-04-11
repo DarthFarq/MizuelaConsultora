@@ -12,6 +12,9 @@ export function renderFloor(container) {
     .filter(a => a.floorid === state.selectedFloor)
 
 container.innerHTML = `
+    <div class="back-general-button" onclick="navigate('building')">
+    <img src="Media/back.png" alt="back">
+    </div>
 <div class="floor">
 
     <!-- LEFT: MAP AREA -->
