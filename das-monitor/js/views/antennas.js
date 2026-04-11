@@ -18,10 +18,11 @@ export function renderAntennas(container) {
     .filter(a => a.floorid === state.selectedFloor)
 
     container.innerHTML = `
-        <div id="antenna-list" class="antennas">
-            <div class="back-button" onclick="navigate('floor')">
+                <div class="back-general-button" onclick="navigate('floor')">
                 <img src="Media/back.png" alt="back">
             </div>
+        <div id="antenna-list" class="antennas">
+
 
             <div id="hub-status" class="hub-status">
                 <div id="hub-dot" class="dot dot-online"></div>
