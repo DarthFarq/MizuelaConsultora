@@ -1,21 +1,17 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Demo Dashboard</title>
-</head>
-<body>
+    <head>
+        <title>Demo Dashboard</title>
 
-    <h1>DAS Monitor</h1>
+        <link rel="stylesheet" href="css/base.css">
+        <link rel="stylesheet" href="css/antennas.css">
+        <link rel="stylesheet" href="css/floor.css">
+    </head>
 
-    <button onclick="navigate('floor')">Floor</button>
-    <button onclick="navigate('antennas')">Antennas</button>
-    <button onclick="navigate('building')">Building</button>
+    <body class="base">
 
-    <hr>
+        <div id="app"></div>
 
-    <div id="app"></div>
-
-    <script type="module" src="./js/app.js"></script>
-
-</body>
+        <script type="module" src="./js/app.js"></script>
+    </body>
 </html>

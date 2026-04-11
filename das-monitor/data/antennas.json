@@ -1,0 +1,80 @@
+{
+    "id": 1,
+    "name": "Building Example",
+    "floors": [
+        {
+            "id": 1,
+            "name": "Floor 1"
+        }
+    ],
+    "antennas": [
+        {
+            "id": 1,
+            "name": "Beacon 1",
+            "floorid": 1,
+            "x": 19,
+            "y": 16,
+            "status": "ok",
+            "metrics": {
+                "rssi": 10.5,
+                "temp": 10,
+                "voltage": 5.5,
+                "altitude": 10,
+                "uptime": 10,
+                "refrssi": 10,
+                "refaltitude": 10
+            }
+        },
+        {
+            "id": 2,
+            "name": "Beacon 2",
+            "floorid": 1,
+            "x": 51,
+            "y": 17,
+            "status": "warning",
+            "metrics": {
+                "rssi": 10.5,
+                "temp": 10,
+                "voltage": 5.5,
+                "altitude": 10,
+                "uptime": 10,
+                "refrssi": 10,
+                "refaltitude": 10
+            }
+        },
+        {
+            "id": 3,
+            "name": "Beacon 3",
+            "floorid": 1,
+            "x": 61,
+            "y": 79,
+            "status": "fault",
+            "metrics": {
+                "rssi": 10.5,
+                "temp": 10,
+                "voltage": 5.5,
+                "altitude": 10,
+                "uptime": 10,
+                "refrssi": 10,
+                "refaltitude": 10
+            }
+        }, 
+        {
+            "id": 4,
+            "name": "Beacon 4",
+            "floorid": 1,
+            "x": 18,
+            "y": 50,
+            "status": "offline",
+            "metrics": {
+                "rssi": "--",
+                "temp": "--",
+                "voltage": "--",
+                "altitude": "--",
+                "uptime": "--",
+                "refrssi": "--",
+                "refaltitude": "--"
+            }
+        }
+    ]
+}
