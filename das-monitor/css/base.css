@@ -1,0 +1,44 @@
+/* Root global */
+:root {
+    --bg: #111827;
+    --card: #1f2937;
+    --ok: #22c55e;
+    --warn: #eab308;
+    --fault: #ef4444;
+    --timeout: #ff4757;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html, body, #app {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* CSS de base.html */
+
+.base {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--bg);
+    color: #f8fafc;
+    padding: 40px;
+    margin: 0;
+}
+.base .button {
+    background: #374151;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.65rem;
+    font-weight: bold;
+}
+
+.base .button:hover { 
+    background: #4b5563; 
+}

@@ -1,3 +1,5 @@
 export const state = {
-    view: 'floor'
+    view: 'floor',
+    selectedFloor: 1,
+    data: null
 }

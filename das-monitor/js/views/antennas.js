@@ -1,129 +1,141 @@
-let antennas = generateMockData(); // 🔥 se genera UNA sola vez
+import { state } from '../state.js'
 
-fetch("data/antennas.json")
-  .then(res => res.json())
-  .then(data => {
-    antennas = data;
-    renderCards();
-  });
+function getIcon(status) {
+    if (status === 'ok') return 'beacon_green.png'
+    if (status === 'warning') return 'beacon_yellow.png'
+    if (status === 'fault') return 'beacon_red.png'
+    if (status === 'offline') return 'beacon_gray.png'
+}
+
+window.toggleCard = function toggleCard(id) {
+    const card = document.getElementById(`card-${id}`);
+    card.classList.toggle('expanded');
+}
 
 export function renderAntennas(container) {
-  container.innerHTML = `
-    <div class="antennas-view">
-      <h2>ANTENNAS</h2>
-      <div id="antenna-list" class="grid"></div>
-    </div>
-  `;
 
-  renderCards();
-}
+    const antennas = state.data.antennas
+    .filter(a => a.floorid === state.selectedFloor)
 
-function renderCards() {
-  const list = document.getElementById("antenna-list");
+    container.innerHTML = `
+        <div id="antenna-list" class="antennas">
+            <div class="back-button" onclick="navigate('floor')">
+                <img src="Media/back.png" alt="back">
+            </div>
 
-list.innerHTML = antennas.map(a => `
-    <div class="card ${a.status === 'offline' ? 'is-offline' : ''}" id="card-${a.id}">
-      
-      <div class="card-row" onclick="toggleCard(${a.id})">
-        <img class="beacon-img-small" src="${getIconByStatus(a.status)}" />
-        
-        <div class="row-main">
-          <div class="row-title">
-            ANTENNA ${a.id}
-            <span class="name">${a.name}</span>
-          </div>
-        </div>
+            <div id="hub-status" class="hub-status">
+                <div id="hub-dot" class="dot dot-online"></div>
+                <span id="hub-text">HUB CONNECTED</span>
+            </div>
 
-        <div class="badge-group">
-          <div class="badge badge-sync ${a.status === 'offline' ? 'unsynced' : ''}">
-            ${a.status === 'offline' ? 'UNSYNCED' : 'SYNCED'}
-          </div>
-          <div class="badge badge-${a.status}">
-            ${formatStatus(a.status)}
-          </div>
-        </div>
-      </div>
+            <button id="reset-system-btn" class="reset-hub-button">
+                Reset Database
+            </button>
 
-      <div class="card-detail">
-        <div class="data-row">
-          <div class="data-item">
-            <div class="label">Signal</div>
-            <div class="value">${a.rssi} dBm</div>
-          </div>
+            <div id="toast" class="toast"></div>
 
-          <div class="data-item">
-            <div class="label">Temp</div>
-            <div class="value">${a.temp} °C</div>
-          </div>
+            <div class="h1">BEACONS FLOOR ${state.selectedFloor}</div>
+            
+            <div class="grid">
+                ${antennas.map(a => `
+                <div class="card ${a.status === 'offline' ? 'is-offline' : ''}" id="card-${a.id}">
 
-          <div class="data-item">
-            <div class="label">Voltage</div>
-            <div class="value">${a.volt} V</div>
-          </div>
+                    <!-- Header -->
 
-          <div class="data-item">
-            <div class="label">Current</div>
-            <div class="value">${a.curr} mA</div>
-          </div>
-        </div>
+                    <div class="card-row" onclick="toggleCard(${a.id})">
+                        
+                        <img id="img-x" src="Media/${getIcon(a.status)}"
+                        class="beacon-img-small">
 
-        <div class="footer">
-            <form action="/update_ref/${a.id}" method="POST" style="display: flex; width: 100%; justify-content: space-between; align-items: center;">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <span class="label">REF:</span>
-                    <input type="number" name="ref_rssi" value="${a.ref_rssi || ''}" style="width: 70px; padding: 4px; border-radius: 4px;">
+                        <div class="row-main">
+                            <div class="row-title">
+                                ${a.name}
+                            </div>
+                        </div>
+
+                        <div class="badge-group">
+                            <div id="badge-sync-x" class="badge badge-sync ${a.status === 'offline' ? 'unsynced' : ''}">
+                                ${a.status === 'offline' ? 'UNSCYNCED' : 'SYNCED'}
+                            </div>
+
+                            <div id="badge-health-x" class="badge badge-${a.status}">
+                                ${a.status.toUpperCase()}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Expand details -->
+
+                    <div class="card-detail" id="detail-x">
+
+                        <div class="data-row">
+                            <div class="data-item">
+                                <div class="label">Signal</div>
+                                <div class="value"><span class="rssi-val">${a.metrics.rssi}</span> dBm</div>
+                            </div>
+
+                            <div class="data-item">
+                                <div class="label">Temp</div>
+                                <div class="value"><span class="temp-val">${a.metrics.temp}</span> °C</div>
+                            </div>
+
+                            <div class="data-item">
+                                <div class="label">Voltage</div>
+                                <div class="value"><span class="volt-val">${a.metrics.voltage}</span> V</div>
+                            </div>
+
+                            <div class="data-item">
+                                <div class="label">Altitude</div>
+                                <div class="value"><span class="curr-val">${a.metrics.altitude}</span> mA</div>
+                            </div>
+
+                            <div class="data-item">
+                                <div class="label">Uptime</div>
+                                <div class="value"><span class="uptime-val">${a.metrics.uptime}</span></div>
+                            </div>
+                        </div>
+
+                        <div class="footer">
+                            <form 
+                                style="width:100%; display:flex; justify-content:space-between; align-items:center;">
+
+                                <div class="footer-left">
+
+                                <div class="input-row">
+                                    <span class="label">REF RSSI:</span>
+                                    <input type="number" name="ref_rssi" value="${a.metrics.refrssi || ''}">
+                                    <button type="button" class="button">SET</button>
+                                </div>
+
+                                <div class="input-row">
+                                    <span class="label">REF ALTITUDE:</span>
+                                    <input type="number" name="ref_altitude" value="${a.metrics.refaltitude || ''}">
+                                    <button type="button" class="button">SET</button>
+                                </div>
+
+                                </div>
+
+                                <button type="submit" class="button">RESET</button>
+
+                            </form>
+                        </div>
+
+                    </div>
                 </div>
-                <button type="submit">RESET</button>
-            </form>
-        </div>
-      </div>
+    `).join('')}
     </div>
-`).join("");
+`
+
+if (window.__targetAntenna) {
+    const id = window.__targetAntenna
+
+    setTimeout(() => {
+        if (window.toggleCard) {
+            window.toggleCard(id)
+        }
+    }, 0)
+
+    window.__targetAntenna = null
 }
 
-
-
-//# 🔹 ICONOS SEGÚN ESTADO (ACÁ CONECTÁS TUS IMÁGENES)
-function getIconByStatus(status) {
-  switch (status) {
-    case "ok": return "static/beacon_green.png";
-    case "warning": return "static/beacon_yellow.png";
-    case "fault": return "static/beacon_red.png";
-    case "offline": return "static/beacon_gray.png";
-    default: return "static/beacon_gray.png";
-  }
 }
-
-
-
-//# 🔹 HELPERS
-
-function generateMockData() {
-  return Array.from({ length: 6 }, (_, i) => ({
-    id: i,
-    name: "Waiting...",
-    rssi: random(-90, -30),
-    temp: random(20, 60),
-    volt: (Math.random() * 5).toFixed(2),
-    curr: random(100, 500),
-    status: randomStatus()
-  }));
-}
-
-function random(min, max) {
-  return Math.floor(Math.random() * (max - min) + min);
-}
-
-function randomStatus() {
-  const states = ["ok", "warning", "fault", "offline"];
-  return states[Math.floor(Math.random() * states.length)];
-}
-
-function formatStatus(status) {
-  return status === "offline" ? "OFFLINE" : status.toUpperCase();
-}
-
-//# 🔹 EXPAND / COLLAPSE
-window.toggleCard = function(id) {
-  document.getElementById(`card-${id}`).classList.toggle("expanded");
-};

@@ -1,16 +1,17 @@
 import { state } from './state.js'
+import { loadData } from './api.js'
 
 import { renderFloor } from './views/floor.js'
 import { renderAntennas } from './views/antennas.js'
 import { renderBuilding } from './views/building.js'
 
-// navegación global
+// Global navigation
 window.navigate = function(view) {
     state.view = view
     render()
 }
 
-// render principal
+// Render view
 function render() {
     const container = document.getElementById('app')
 
@@ -27,5 +28,11 @@ function render() {
     }
 }
 
-// init
-render()
+async function init() {
+    state.data = await loadData()
+    console.log(state.data)
+    render()
+}
+
+// Init
+init()
