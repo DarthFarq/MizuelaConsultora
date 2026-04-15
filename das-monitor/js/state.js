@@ -1,5 +1,5 @@
 export const state = {
-    view: 'building',
+    view: 'floor',
     selectedFloor: 1,
     data: null
 }

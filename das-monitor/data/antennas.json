@@ -8,12 +8,12 @@
         { "id": 4, "name": "Piso 3 - Terraza" }
     ],
     "antennas": [
-        { "id": 1, "name": "Beacon PB-01", "floorid": 1, "x": 15, "y": 20, "status": "ok", "metrics": { "rssi": -45, "temp": 22.5, "voltage": 5.8, "altitude": 0.5, "uptime": 1240, "refrssi": -42, "refaltitude": 0.5 }},
-        { "id": 2, "name": "Beacon PB-02", "floorid": 1, "x": 75, "y": 80, "status": "warning", "metrics": { "rssi": -78, "temp": 28.1, "voltage": 4.2, "altitude": 0.5, "uptime": 850, "refrssi": -42, "refaltitude": 0.5 }},
+        { "id": 1, "name": "Beacon PB-01", "floorid": 1, "x": 20, "y": 19, "status": "ok", "metrics": { "rssi": -45, "temp": 22.5, "voltage": 5.8, "altitude": 0.5, "uptime": 1240, "refrssi": -42, "refaltitude": 0.5 }},
+        { "id": 2, "name": "Beacon PB-02", "floorid": 1, "x": 91, "y": 76, "status": "warning", "metrics": { "rssi": -78, "temp": 28.1, "voltage": 4.2, "altitude": 0.5, "uptime": 850, "refrssi": -42, "refaltitude": 0.5 }},
         
-        { "id": 3, "name": "Beacon F1-01", "floorid": 2, "x": 10, "y": 10, "status": "ok", "metrics": { "rssi": -50, "temp": 21.0, "voltage": 5.9, "altitude": 3.5, "uptime": 2100, "refrssi": -48, "refaltitude": 3.5 }},
-        { "id": 4, "name": "Beacon F1-02", "floorid": 2, "x": 50, "y": 30, "status": "fault", "metrics": { "rssi": -95, "temp": 45.0, "voltage": 3.1, "altitude": 3.5, "uptime": 100, "refrssi": -48, "refaltitude": 3.5 }},
-        { "id": 5, "name": "Beacon F1-03", "floorid": 2, "x": 85, "y": 15, "status": "ok", "metrics": { "rssi": -52, "temp": 22.2, "voltage": 5.8, "altitude": 3.5, "uptime": 2100, "refrssi": -48, "refaltitude": 3.5 }},
+        { "id": 3, "name": "Beacon F1-01", "floorid": 2, "x": 10, "y": 20, "status": "ok", "metrics": { "rssi": -50, "temp": 21.0, "voltage": 5.9, "altitude": 3.5, "uptime": 2100, "refrssi": -48, "refaltitude": 3.5 }},
+        { "id": 4, "name": "Beacon F1-02", "floorid": 2, "x": 50, "y": 80, "status": "fault", "metrics": { "rssi": -95, "temp": 45.0, "voltage": 3.1, "altitude": 3.5, "uptime": 100, "refrssi": -48, "refaltitude": 3.5 }},
+        { "id": 5, "name": "Beacon F1-03", "floorid": 2, "x": 90, "y": 15, "status": "ok", "metrics": { "rssi": -52, "temp": 22.2, "voltage": 5.8, "altitude": 3.5, "uptime": 2100, "refrssi": -48, "refaltitude": 3.5 }},
         
         { "id": 6, "name": "Beacon L2-01", "floorid": 3, "x": 20, "y": 45, "status": "ok", "metrics": { "rssi": -48, "temp": 19.5, "voltage": 6.0, "altitude": 7.0, "uptime": 3400, "refrssi": -45, "refaltitude": 7.0 }},
         { "id": 7, "name": "Beacon L2-02", "floorid": 3, "x": 40, "y": 55, "status": "ok", "metrics": { "rssi": -49, "temp": 19.8, "voltage": 5.9, "altitude": 7.0, "uptime": 3400, "refrssi": -45, "refaltitude": 7.0 }},
