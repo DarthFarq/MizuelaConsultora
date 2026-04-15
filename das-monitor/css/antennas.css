@@ -221,3 +221,29 @@
     color: var(--timeout);
     background: rgba(255,71,87,0.2);
 }
+
+/* CONTENEDOR IZQUIERDO */
+.antennas .footer-left {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* CADA FILA COMO GRID */
+.input-row {
+    display: grid;
+    grid-template-columns: 120px 140px 60px;
+    align-items: center;
+    gap: 10px;
+}
+
+/* LABEL MÁS LIMPIO */
+.input-row .label {
+    font-size: 0.7rem;
+    color: #9ca3af;
+}
+
+/* INPUT FULL WIDTH DENTRO DE SU COLUMNA */
+.input-row input {
+    width: 100%;
+}
