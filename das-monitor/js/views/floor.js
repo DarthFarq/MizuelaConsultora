@@ -69,20 +69,22 @@ export function renderFloor(container) {
             <!-- MAP CANVAS -->
             <div class="floor-map-canvas">
 
-                <img 
-                    src="Media/Floors/${state.selectedFloor}.webp" 
-                    class="floor-map-image"
-                >
+                <div class="floor-map-image-wrapper">
+                    <img 
+                        src="Media/Floors/${state.selectedFloor}.webp" 
+                        class="floor-map-image"
+                    >
 
-                ${antennas.map(a => `
-                    <div 
-                        class="floor-beacon ${a.status}"
-                        style="left:${a.x}%; top:${a.y}%;"
-                        data-name="${a.name}"
-                        data-status="${a.status.toUpperCase()}"
-                        onclick="openAntennaFromMap(${a.id})"
-                    ></div>
-                `).join('')}
+                    ${antennas.map(a => `
+                        <div 
+                            class="floor-beacon ${a.status}"
+                            style="left:${a.x}%; top:${a.y}%;"
+                            data-name="${a.name}"
+                            data-status="${a.status.toUpperCase()}"
+                            onclick="openAntennaFromMap(${a.id})"
+                        ></div>
+                    `).join('')}
+                </div>
 
             </div>
 

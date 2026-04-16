@@ -17,6 +17,19 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+}
+.floor .floor-map::after {
+    content: "";
+    position: absolute;
+
+    top: 40px;
+    bottom: 40px;
+
+    right: -20px; /* 👈 ajustá fino (20px = mitad del gap visual) */
+
+    width: 1px;
+    background: #374151;
 }
 
 /* CONTENEDOR CENTRAL FIJO */
@@ -39,6 +52,17 @@
     padding-top: 40px;
     color: #e5e7eb;
     margin: 0 0 20px 0;
+}
+.floor .floor-map-title,
+.floor .floor-preview-title {
+    padding-top: 40px;
+    margin: 0 0 20px 0
+}
+.floor .floor-preview-title {
+    padding-left: 0;
+}
+.floor .floor-preview-title {
+    padding-left: 0;
 }
 
 /* CANVAS 16:9 FIJO */
@@ -112,7 +136,6 @@
 /* RIGHT PANEL */
 .floor .floor-preview {
     flex: 2;
-    border-left: 2px solid #000;
     background: #111827;
 
     display: flex;
@@ -120,6 +143,7 @@
 
     height: 100%;        
     overflow: hidden;    
+    padding-left: 40px;
 }
 
 /* TITLE RIGHT */
@@ -505,4 +529,31 @@
 .floor .floor-map-container,
 .floor .floor-preview {
     min-height: 0;
+}
+
+.floor .floor {
+    position: relative;
+}
+
+.floor .floor::after {
+    content: "";
+    position: absolute;
+    top: 40px;
+    bottom: 40px;
+
+    left: 60%; /* 👈 ajustable según proporción (flex 3 / 2 ≈ 60%) */
+
+    width: 1px;
+    background: #374151;
+}
+
+.floor .floor-map-image-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.floor .floor-map-image {
+    display: block;
+    max-width: 100%;
+    height: auto;
 }
