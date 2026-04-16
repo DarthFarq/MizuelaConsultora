@@ -7,6 +7,10 @@ function getIcon(status) {
     if (status === 'offline') return 'beacon_gray.png'
 }
 
+window.toggleLog = function toggleLog() {
+            document.getElementById('log-panel').classList.toggle('open');
+        }
+
 window.toggleCard = function toggleCard(id) {
     const card = document.getElementById(`card-${id}`);
     if (card) card.classList.toggle('expanded');
@@ -18,7 +22,6 @@ window.openAntennaFromMap = function(id) {
 
     const isOpen = card.classList.contains('expanded')
 
-    // Cerrar todas las demás
     document.querySelectorAll('.card.expanded')
         .forEach(c => {
             if (c.id !== `card-${id}`) {
@@ -27,13 +30,10 @@ window.openAntennaFromMap = function(id) {
         })
 
     if (isOpen) {
-        // Si ya estaba abierta → la cerramos
         card.classList.remove('expanded')
     } else {
-        // Si estaba cerrada → la abrimos
         card.classList.add('expanded')
 
-        // Scroll hacia la card
         card.scrollIntoView({
             behavior: 'smooth',
             block: 'center'
@@ -56,17 +56,15 @@ export function renderFloor(container) {
     container.innerHTML = `
 <div class="floor">
 
-    <!-- LEFT: MAP AREA -->
+    <!-- Left panel -->
     <div class="floor-map">
 
         <div class="floor-map-container">
 
-            <!-- TITLE -->
             <div class="floor-map-title">
                 ${floor ? floor.name : 'Unknown Floor'}
             </div>
 
-            <!-- MAP CANVAS -->
             <div class="floor-map-canvas">
 
                 <div class="floor-map-image-wrapper">
@@ -91,8 +89,9 @@ export function renderFloor(container) {
         </div>
 
     </div>
+    
+    <!-- Right panel -->
 
-    <!-- RIGHT: ANTENNAS (FULL CARDS) -->
     <div class="floor-preview">
 
         <div id="hub-status" class="hub-status">
@@ -198,6 +197,13 @@ export function renderFloor(container) {
             Reset Database
         </button>
 
+    </div>
+
+    <div class="log-toggle">
+        <div id="log-panel" class="log-panel">
+            <div id="log-content" class="log-content"></div>
+        </div>
+        <button class="log-toggle-btn" onclick="toggleLog()">▲ UART LOG ▲</button>
     </div>
 
 </div>

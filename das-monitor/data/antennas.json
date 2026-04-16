@@ -5,7 +5,9 @@
         { "id": 1, "name": "Office Floor" }
     ],
     "antennas": [
-        { "id": 1, "name": "Beacon PB-01", "floorid": 1, "x": 25, "y": 50, "status": "ok", "metrics": { "rssi": -45, "temp": 22.5, "voltage": 5.8, "altitude": 0.5, "uptime": 1240, "refrssi": -42, "refaltitude": 0.5 }},
-        { "id": 2, "name": "Beacon PB-02", "floorid": 1, "x": 70, "y": 50, "status": "warning", "metrics": { "rssi": -78, "temp": 28.1, "voltage": 4.2, "altitude": 0.5, "uptime": 850, "refrssi": -42, "refaltitude": 0.5 }}
+        { "id": 1, "name": "Beacon PB-01", "floorid": 1, "x": 30, "y": 50, "status": "ok", "metrics": { "rssi": -45, "temp": 22.5, "voltage": 5.8, "altitude": 0.5, "uptime": 1240, "refrssi": -42, "refaltitude": 0.5 }},
+        { "id": 2, "name": "Beacon PB-02", "floorid": 1, "x": 45, "y": 50, "status": "warning", "metrics": { "rssi": -78, "temp": 28.1, "voltage": 4.2, "altitude": 0.5, "uptime": 850, "refrssi": -42, "refaltitude": 0.5 }},
+        { "id": 3, "name": "Beacon PB-03", "floorid": 1, "x": 62, "y": 50, "status": "fault", "metrics": { "rssi": -78, "temp": 28.1, "voltage": 4.2, "altitude": 0.5, "uptime": 850, "refrssi": -42, "refaltitude": 0.5 }},
+        { "id": 3, "name": "Beacon PB-03", "floorid": 1, "x": 83, "y": 50, "status": "offline", "metrics": { "rssi": -78, "temp": 28.1, "voltage": 4.2, "altitude": 0.5, "uptime": 850, "refrssi": -42, "refaltitude": 0.5 }}
     ]
 }
